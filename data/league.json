@@ -1,0 +1,208 @@
+{
+  "season": "2026–27",
+  "lastUpdated": "2026-11-19",
+  "teams": {
+    "WYC": {
+      "name": "Wycombe Abbey",
+      "short": "WYC",
+      "colour": "#0b2a5b",
+      "logo": "img/logos/wyc.webp"
+    },
+    "DIN": {
+      "name": "Dingwen FC",
+      "short": "DIN",
+      "colour": "#1f9a4a",
+      "logo": "img/logos/din.webp"
+    },
+    "BAS": {
+      "name": "BASIS",
+      "short": "BAS",
+      "colour": "#2f55a4",
+      "logo": "img/logos/bas.webp"
+    },
+    "WAH": {
+      "name": "WAHAHA",
+      "short": "WAH",
+      "colour": "#1a9fa8",
+      "logo": "img/logos/wah.webp"
+    },
+    "WBO": {
+      "name": "Wellington Boots",
+      "short": "WBO",
+      "colour": "#e8731a",
+      "logo": "img/logos/wel.webp",
+      "badgeLetter": "B"
+    },
+    "WLI": {
+      "name": "Wellington Lions",
+      "short": "WLI",
+      "colour": "#d9a400",
+      "logo": "img/logos/wel.webp",
+      "badgeLetter": "L"
+    },
+    "HIS": {
+      "name": "HIS",
+      "short": "HIS",
+      "colour": "#14306b",
+      "logo": "img/logos/his.webp"
+    }
+  },
+  "gameweeks": [
+    {
+      "gameweek": 1,
+      "date": "2026-10-16",
+      "matches": [
+        { "home": "WYC", "away": "WLI", "score": [6, 1] },
+        { "home": "BAS", "away": "WAH", "score": [4, 4] },
+        { "home": "DIN", "away": "HIS", "score": [1, 0], "forfeit": true }
+      ],
+      "bye": "WBO"
+    },
+    {
+      "gameweek": 2,
+      "date": "2026-10-30",
+      "matches": [
+        { "home": "HIS", "away": "WAH", "score": [0, 1] },
+        { "home": "WYC", "away": "BAS", "score": [2, 0] },
+        { "home": "WLI", "away": "WBO", "score": [2, 1] }
+      ],
+      "bye": "DIN"
+    },
+    {
+      "gameweek": 3,
+      "date": "2026-11-20",
+      "matches": [
+        { "home": "WLI", "away": "HIS", "score": null },
+        { "home": "DIN", "away": "WBO", "score": null },
+        { "home": "WYC", "away": "WAH", "score": null }
+      ],
+      "bye": "BAS"
+    },
+    {
+      "gameweek": 4,
+      "date": "2026-11-27",
+      "matches": [
+        { "home": "BAS", "away": "DIN", "score": null },
+        { "home": "WAH", "away": "WLI", "score": null },
+        { "home": "WBO", "away": "WYC", "score": null }
+      ],
+      "bye": "HIS"
+    },
+    {
+      "gameweek": 5,
+      "date": "2026-12-11",
+      "matches": [
+        { "home": "WBO", "away": "BAS", "score": null },
+        { "home": "HIS", "away": "WYC", "score": null },
+        { "home": "WAH", "away": "DIN", "score": null }
+      ],
+      "bye": "WLI"
+    },
+    {
+      "gameweek": 6,
+      "date": "2027-01-08",
+      "matches": [
+        { "home": "DIN", "away": "WYC", "score": null },
+        { "home": "WBO", "away": "HIS", "score": null },
+        { "home": "BAS", "away": "WLI", "score": null }
+      ],
+      "bye": "WAH"
+    },
+    {
+      "gameweek": 7,
+      "date": "2027-01-22",
+      "matches": [
+        { "home": "WAH", "away": "WBO", "score": null },
+        { "home": "WLI", "away": "DIN", "score": null },
+        { "home": "HIS", "away": "BAS", "score": null }
+      ],
+      "bye": "WYC",
+      "note": "Winter break follows · league returns 26 February"
+    },
+    {
+      "gameweek": 8,
+      "date": "2027-02-26",
+      "matches": [
+        { "home": "DIN", "away": "BAS", "score": null },
+        { "home": "WLI", "away": "WAH", "score": null },
+        { "home": "WYC", "away": "WBO", "score": null }
+      ],
+      "bye": "HIS"
+    },
+    {
+      "gameweek": 9,
+      "date": "2027-03-12",
+      "matches": [
+        { "home": "WLI", "away": "WYC", "score": null },
+        { "home": "WAH", "away": "BAS", "score": null },
+        { "home": "HIS", "away": "DIN", "score": null }
+      ],
+      "bye": "WBO"
+    },
+    {
+      "gameweek": 10,
+      "date": "2027-03-26",
+      "matches": [
+        { "home": "WAH", "away": "HIS", "score": null },
+        { "home": "BAS", "away": "WYC", "score": null },
+        { "home": "WBO", "away": "WLI", "score": null }
+      ],
+      "bye": "DIN"
+    },
+    {
+      "gameweek": 11,
+      "date": "2027-04-09",
+      "matches": [
+        { "home": "BAS", "away": "WBO", "score": null },
+        { "home": "WYC", "away": "HIS", "score": null },
+        { "home": "DIN", "away": "WAH", "score": null }
+      ],
+      "bye": "WLI"
+    },
+    {
+      "gameweek": 12,
+      "date": "2027-04-23",
+      "matches": [
+        { "home": "WYC", "away": "DIN", "score": null },
+        { "home": "HIS", "away": "WBO", "score": null },
+        { "home": "WLI", "away": "BAS", "score": null }
+      ],
+      "bye": "WAH"
+    },
+    {
+      "gameweek": 13,
+      "date": "2027-05-07",
+      "matches": [
+        { "home": "WBO", "away": "WAH", "score": null },
+        { "home": "DIN", "away": "WLI", "score": null },
+        { "home": "BAS", "away": "HIS", "score": null }
+      ],
+      "bye": "WYC"
+    },
+    {
+      "gameweek": 14,
+      "date": "2027-05-21",
+      "matches": [
+        { "home": "HIS", "away": "WLI", "score": null },
+        { "home": "WBO", "away": "DIN", "score": null },
+        { "home": "WAH", "away": "WYC", "score": null }
+      ],
+      "bye": "BAS"
+    }
+  ],
+  "players": {
+    "WYC": [
+      { "name": "Paul", "apps": 2, "goals": 4, "assists": 1, "cleanSheets": 0 },
+      { "name": "Connaire", "apps": 2, "goals": 1, "assists": 0, "cleanSheets": 0 },
+      { "name": "Andrew", "apps": 2, "goals": 1, "assists": 1, "cleanSheets": 1 },
+      { "name": "Goran", "apps": 2, "goals": 1, "assists": 0, "cleanSheets": 1 },
+      { "name": "Todd", "apps": 1, "goals": 0, "assists": 0, "cleanSheets": 0 },
+      { "name": "Aiden", "apps": 2, "goals": 0, "assists": 1, "cleanSheets": 1 },
+      { "name": "ZZ", "apps": 2, "goals": 0, "assists": 0, "cleanSheets": 0 },
+      { "name": "Zhang", "apps": 1, "goals": 0, "assists": 1, "cleanSheets": 0 },
+      { "name": "Meng", "apps": 2, "goals": 0, "assists": 0, "cleanSheets": 1 },
+      { "name": "Simon", "apps": 1, "goals": 0, "assists": 0, "cleanSheets": 1 },
+      { "name": "Jacky", "apps": 1, "goals": 1, "assists": 0, "cleanSheets": 0 }
+    ]
+  }
+}
