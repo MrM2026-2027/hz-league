@@ -156,7 +156,7 @@ function view() {
   document.querySelectorAll('.view').forEach(x => x.hidden = x.dataset.view != v);
   document.querySelectorAll('.tabs a').forEach(a => a.setAttribute('aria-current', a.dataset.v == v ? 'page' : 'false'));
 }
-$('crests').innerHTML = Object.keys(T).map(id => `<button data-t="${id}">${crest(id, 44)}<span>${T[id].n}</span></button>`).join('');
+$('crests').innerHTML = Object.keys(T).map(id => `<button data-t="${id}">${crest(id, 44)}<span class="cn">${T[id].n}</span><span class="cs">${T[id].s}</span></button>`).join('');
 document.addEventListener('click', e => {
   if (e.target.closest('[data-close]')) { close(); return; }
   const ps = e.target.closest('[data-s]');
