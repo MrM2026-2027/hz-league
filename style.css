@@ -155,3 +155,24 @@ html{scroll-padding-top:72px}
 
 @media(max-width:600px){#tbl td,#tbl th{padding-left:4px;padding-right:4px}#tbl .form i{width:18px;height:18px;font-size:11px}#tbl .pos{width:26px;height:26px}}
 .panel .pl-top{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+/* team awards + match photos */
+.awh{font-size:26px;margin:22px 0 10px}.awh:first-of-type{margin-top:6px}
+.fp header{background:linear-gradient(120deg,#5a1f05,#1f2253);color:#ffc08a}.fp .aw-num b{color:#ff8a3d}
+.bw header{background:linear-gradient(120deg,#4a1a14,#1f2253);color:#f3b3a6}.bw .aw-num b{color:#f08a73}
+button.sc{border:0;cursor:pointer;box-shadow:0 0 0 2px var(--tl)}
+.mph{grid-column:1/-1;display:flex;align-items:center;gap:10px;width:100%;background:#15173a;border:1px solid var(--line);border-radius:10px;padding:6px;margin-top:4px;color:var(--ink);font-weight:700;font-size:14px;text-align:left}
+.mph img{width:96px;height:60px;object-fit:cover;border-radius:6px}
+.mph:hover{border-color:var(--tl)}
+.li-ph{width:100%;border:1px solid var(--tl);color:inherit;text-align:left;font:inherit;grid-template-columns:auto minmax(0,1fr) auto}
+.li-ph img{grid-column:1/-1;width:100%;height:120px;object-fit:cover;border-radius:8px}
+.mview{z-index:30}
+.mpanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(960px,94vw);max-height:94vh;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:16px;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:translate(-50%,-48%)}}
+.mpanel .x{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.45);font-size:22px;z-index:1}
+.mh{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;padding:4px 52px 12px;font-weight:700}
+.mh .h{display:flex;align-items:center;justify-content:flex-end;gap:8px;text-align:right}.mh .a{display:flex;align-items:center;gap:8px}
+.mh .sc{box-shadow:none}
+.mimg{display:block;width:100%;border-radius:10px}
+.mcap{margin:10px 2px 2px;color:var(--mut);font-size:14px}
+@media(max-width:600px){.mh{padding:4px 44px 10px 0;font-size:14px}.mpanel{padding:10px}}

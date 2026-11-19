@@ -63,7 +63,7 @@
       "date": "2026-10-30",
       "matches": [
         { "home": "HIS", "away": "WAH", "score": [0, 1] },
-        { "home": "WYC", "away": "BAS", "score": [2, 0] },
+        { "home": "WYC", "away": "BAS", "score": [2, 0], "photo": "img/matches/2026-10-30-wyc-bas.jpg", "caption": "Wycombe Abbey and BASIS after the final whistle" },
         { "home": "WLI", "away": "WBO", "score": [2, 1] }
       ],
       "bye": "DIN"

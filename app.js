@@ -16,7 +16,7 @@ const T = {};
 for (const [id, t] of Object.entries(D.teams)) T[id] = {n: t.name, s: t.short, c: t.colour, l: t.logo, p: t.badgeLetter || ''};
 const GW = D.gameweeks;
 const M = [];
-GW.forEach(g => g.matches.forEach(m => M.push({gw: g.gameweek, d: g.date, h: m.home, a: m.away, sc: m.score, ff: !!m.forfeit})));
+GW.forEach(g => g.matches.forEach(m => M.push({gw: g.gameweek, d: g.date, h: m.home, a: m.away, sc: m.score, ff: !!m.forfeit, ph: m.photo || '', cap: m.caption || '', k: g.gameweek + '-' + m.home + '-' + m.away})));
 const res = m => m.sc ? [m.sc[0], m.sc[1], m.ff ? 'ff' : ''] : null;
 // player row: [name, apps, goals, assists, cleanSheets, goals+assists, team]
 const PLAYERS = {}, ALL = [];
@@ -80,11 +80,27 @@ function award(title, icon, k, unit, cls) {
   return `<article class="aw ${cls}"><header>${icon}<div><h3>${title}</h3><small>Most ${unit}s across the league</small></div></header><div class="aw-top">${top}</div>
   <ol class="aw-list">${R.slice(0, 10).map(([r, p]) => `<li><span class="rk">${r}</span><button class="aw-row" data-t="${p[6]}">${crest(p[6], 26)}<span><b>${esc(p[0])}</b><small>${T[p[6]].n} · ${p[1]} app${p[1] == 1 ? '' : 's'}</small></span></button><span class="v">${p[k]}</span></li>`).join('')}</ol></article>`;
 }
+const WALL = '<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><g fill="#c4553d" stroke="#5b2016" stroke-width="2"><rect x="4" y="10" width="26" height="12" rx="1.5"/><rect x="34" y="10" width="26" height="12" rx="1.5"/><rect x="4" y="26" width="12" height="12" rx="1.5"/><rect x="20" y="26" width="26" height="12" rx="1.5"/><rect x="50" y="26" width="10" height="12" rx="1.5"/><rect x="4" y="42" width="26" height="12" rx="1.5"/><rect x="34" y="42" width="26" height="12" rx="1.5"/></g></svg>';
+const FIRE = '<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><path d="M32 4c4 10 16 16 16 32a16 16 0 0 1-32 0c0-8 4-12 7-16 0 6 3 9 6 10-2-10 1-18 3-26z" fill="#ff7a1a" stroke="#7a2a00" stroke-width="2.5" stroke-linejoin="round"/><path d="M32 30c3 5 8 8 8 15a8 8 0 0 1-16 0c0-5 3-7 5-10 0 3 2 5 3 5z" fill="#f5c518"/></svg>';
+function teamAward(title, icon, k, asc, unit, sub, cls) {
+  const st = table().filter(s => s.p > 0);
+  st.sort((a, b) => asc ? a[k] - b[k] || b.p - a.p || T[a.id].n.localeCompare(T[b.id].n) : b[k] - a[k] || a.p - b.p || T[a.id].n.localeCompare(T[b.id].n));
+  let r = 0, prev = null; const R = st.map((s, i) => { if (s[k] !== prev) { r = i + 1; prev = s[k]; } return [r, s]; });
+  const lead = R.filter(x => x[0] == 1).map(x => x[1]);
+  const per = s => (s[k] / s.p).toFixed(1).replace('.0', '');
+  const top = lead.length
+    ? `<div class="aw-lead">${lead.map(s => `<button class="aw-p" data-t="${s.id}">${crest(s.id, 34)}<span><b>${T[s.id].n}</b><small>${s.p} game${s.p == 1 ? '' : 's'} played</small></span></button>`).join('')}</div>
+       <div class="aw-num"><b>${lead[0][k]}</b><span>${unit}${lead[0][k] == 1 ? '' : 's'}</span><em>${lead.length > 1 ? 'Joint leaders' : 'Leader'}</em></div>`
+    : '<p class="sub">No games played yet.</p>';
+  return `<article class="aw ${cls}"><header>${icon}<div><h3>${title}</h3><small>${sub}</small></div></header><div class="aw-top">${top}</div>
+  <ol class="aw-list">${R.map(([r, s]) => `<li><span class="rk">${r}</span><button class="aw-row" data-t="${s.id}">${crest(s.id, 26)}<span><b>${T[s.id].n}</b><small>${s.p} game${s.p == 1 ? '' : 's'} · ${per(s)} per game</small></span></button><span class="v">${s[k]}</span></li>`).join('')}</ol></article>`;
+}
 function awards() {
   const have = Object.keys(PLAYERS).map(t => T[t].n);
   const missing = Object.keys(T).filter(t => !PLAYERS[t]).length;
   $('aw-note').textContent = missing ? `Player stats so far from: ${have.join(', ') || 'no clubs yet'}. Other clubs will be added as they send them in.` : 'Player stats from all clubs.';
   $('awards').innerHTML = award('Golden Boot', BOOT, 2, 'goal', 'gb') + award('Playmaker Award', PASS, 3, 'assist', 'pm');
+  $('team-awards').innerHTML = teamAward('Firepower', FIRE, 'gf', false, 'goal', 'Most goals scored by a team', 'fp') + teamAward('Brick Wall', WALL, 'ga', true, 'goal', 'Fewest goals conceded by a team', 'bw');
 }
 
 // ---------- home ----------
@@ -110,11 +126,12 @@ function renderGws() {
 }
 function mrow(m) {
   const r = res(m), past = days(m.d) < 0;
-  const mid = r ? `<div class="sc">${r[0]} – ${r[1]}</div>` : '<div class="sc p">v</div>';
+  const mid = r ? (m.ph ? `<button class="sc" data-m="${m.k}" aria-label="Open match photo">${r[0]} – ${r[1]}</button>` : `<div class="sc">${r[0]} – ${r[1]}</div>`) : '<div class="sc p">v</div>';
   let x = '';
   if (r && r[2] == 'ff') x = '<div class="note">★ Awarded by forfeit</div>';
   if (!r && past) x = '<div class="note">Played – result to follow</div>';
-  return `<div class="m"><button class="t h" data-t="${m.h}">${T[m.h].n} ${crest(m.h, 28)}</button>${mid}<button class="t" data-t="${m.a}">${crest(m.a, 28)} ${T[m.a].n}</button>${x}</div>`;
+  if (m.ph) x += `<button class="mph" data-m="${m.k}"><img src="${m.ph}" alt="" loading="lazy"><span>Match photo</span></button>`;
+  return `<div class="m${m.ph ? ' has-ph' : ''}"><button class="t h" data-t="${m.h}">${T[m.h].n} ${crest(m.h, 28)}</button>${mid}<button class="t" data-t="${m.a}">${crest(m.a, 28)} ${T[m.a].n}</button>${x}</div>`;
 }
 function renderGw() {
   const g = GW[cur], ms = M.filter(m => m.gw == g.gameweek), n = ms.filter(res).length, d = days(g.date);
@@ -134,6 +151,7 @@ function club(id) {
     const home = m.h == id, o = home ? m.a : m.h, r = res(m); let right;
     if (r) { const f = home ? r[0] : r[1], a = home ? r[1] : r[0], c = f > a ? 'W' : f < a ? 'L' : 'D'; right = `<span class="r">${f}–${a}</span> <span class="form"><i class="${c}">${c}</i></span>`; }
     else right = days(m.d) < 0 ? '<small>Result to follow</small>' : `<small>${fd(m.d)}</small>`;
+    if (m.ph) return `<button class="li li-ph" data-m="${m.k}"><span class="ha" title="${home ? 'Home' : 'Away'}">${home ? 'H' : 'A'}</span><div>${home ? 'v' : '@'} <b>${T[o].n}</b><small>GW${m.gw} · ${fd(m.d)} · Match photo</small></div><div>${right}</div><img src="${m.ph}" alt="" loading="lazy"></button>`;
     return `<div class="li"><span class="ha" title="${home ? 'Home' : 'Away'}">${home ? 'H' : 'A'}</span><div>${home ? 'v' : '@'} <b>${T[o].n}</b><small>GW${m.gw} · ${fd(m.d)}${r && r[2] == 'ff' ? ' · forfeit' : ''}</small></div><div>${right}</div></div>`;
   };
   const byes = GW.filter(g => g.bye == id).map(g => `GW${g.gameweek} (${fd(g.date, {day: 'numeric', month: 'short'})})`);
@@ -150,6 +168,18 @@ function club(id) {
 }
 function close() { open = null; $('sheet').classList.remove('on'); document.body.style.overflow = ''; }
 
+// ---------- match photo viewer ----------
+function match(k) {
+  const m = M.find(x => x.k == k); if (!m || !m.ph) return;
+  const r = res(m);
+  $('mpanel').innerHTML = `<button class="x" data-mclose aria-label="Close">×</button>
+  <div class="mh"><span class="h">${T[m.h].n} ${crest(m.h, 34)}</span><span class="sc">${r ? r[0] + ' – ' + r[1] : 'v'}</span><span class="a">${crest(m.a, 34)} ${T[m.a].n}</span></div>
+  <img class="mimg" src="${m.ph}" alt="${esc(m.cap || T[m.h].n + ' v ' + T[m.a].n)}">
+  <p class="mcap">${m.cap ? esc(m.cap) + ' · ' : ''}Gameweek ${m.gw} · ${fd(m.d, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})}</p>`;
+  $('mview').classList.add('on'); document.body.style.overflow = 'hidden'; $('mpanel').querySelector('.x').focus();
+}
+function mclose() { $('mview').classList.remove('on'); if (!open) document.body.style.overflow = ''; }
+
 // ---------- views & events ----------
 function view() {
   const v = ['table', 'fixtures', 'awards'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'table';
@@ -158,6 +188,9 @@ function view() {
 }
 $('crests').innerHTML = Object.keys(T).map(id => `<button data-t="${id}">${crest(id, 44)}<span class="cn">${T[id].n}</span><span class="cs">${T[id].s}</span></button>`).join('');
 document.addEventListener('click', e => {
+  if (e.target.closest('[data-mclose]')) { mclose(); return; }
+  const mk = e.target.closest('[data-m]');
+  if (mk) { match(mk.dataset.m); return; }
   if (e.target.closest('[data-close]')) { close(); return; }
   const ps = e.target.closest('[data-s]');
   if (ps) { psort = +ps.dataset.s; const p = $('panel'), sc = p.scrollTop; club(open); p.scrollTop = sc; return; }
@@ -166,7 +199,7 @@ document.addEventListener('click', e => {
   const t = e.target.closest('[data-t]');
   if (t && !e.target.closest('.panel')) club(t.dataset.t);
 });
-document.addEventListener('keydown', e => { if (e.key == 'Escape' && open) close(); });
+document.addEventListener('keydown', e => { if (e.key != 'Escape') return; if ($('mview').classList.contains('on')) mclose(); else if (open) close(); });
 addEventListener('hashchange', view);
 view(); render(); awards();
 })();
