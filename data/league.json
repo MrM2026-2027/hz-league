@@ -72,8 +72,8 @@
       "gameweek": 3,
       "date": "2026-11-13",
       "matches": [
-        { "home": "WLI", "away": "HIS", "score": [1, 0] },
-        { "home": "DIN", "away": "WBO", "score": [0, 1] },
+        { "home": "WLI", "away": "HIS", "score": [1, 0], "forfeit": true },
+        { "home": "DIN", "away": "WBO", "score": [0, 1], "forfeit": true },
         { "home": "WYC", "away": "WAH", "score": null, "date": "2026-11-20" }
       ],
       "bye": "BAS"
