@@ -16,7 +16,7 @@ const T = {};
 for (const [id, t] of Object.entries(D.teams)) T[id] = {n: t.name, s: t.short, c: t.colour, l: t.logo, p: t.badgeLetter || ''};
 const GW = D.gameweeks;
 const M = [];
-GW.forEach(g => g.matches.forEach(m => M.push({gw: g.gameweek, d: g.date, h: m.home, a: m.away, sc: m.score, ff: !!m.forfeit, ph: m.photo || '', cap: m.caption || '', k: g.gameweek + '-' + m.home + '-' + m.away})));
+GW.forEach(g => g.matches.forEach(m => M.push({gw: g.gameweek, d: m.date || g.date, gd: g.date, h: m.home, a: m.away, sc: m.score, ff: !!m.forfeit, ph: m.photo || '', cap: m.caption || '', k: g.gameweek + '-' + m.home + '-' + m.away})));
 const res = m => m.sc ? [m.sc[0], m.sc[1], m.ff ? 'ff' : ''] : null;
 // player row: [name, apps, goals, assists, cleanSheets, goals+assists, team]
 const PLAYERS = {}, ALL = [];
@@ -109,11 +109,12 @@ function render() {
   const st = table(), played = M.filter(res).length;
   $('tsub').textContent = `${played} of ${M.length} games played. Tap a club for its full record.`;
   document.querySelector('#tbl tbody').innerHTML = st.map(s => `<tr data-t="${s.id}" class="${s.pos == 1 && s.pts ? 'top' : ''}"><td><span class="pos">${s.pos}</span></td><td class="tm"><button data-t="${s.id}">${crest(s.id, 30)}<span class="full">${T[s.id].n}</span><span class="sh">${T[s.id].s}</span></button></td><td>${s.p}</td><td>${s.w}</td><td>${s.d}</td><td>${s.l}</td><td class="hx">${s.gf}</td><td class="hx">${s.ga}</td><td>${sg(s.gd)}</td><td class="pts">${s.pts}</td><td>${form(s.f)}</td></tr>`).join('');
-  const nxt = GW.findIndex(g => days(g.date) >= 0), L = st[0];
+  const L = st[0], up = M.filter(m => !res(m) && days(m.d) >= 0), nd = up.length ? up.reduce((x, m) => m.d < x ? m.d : x, up[0].d) : null;
   let b = `<div class="row"><div><div class="lab">Top of the table</div><div class="lcd big">${T[L.id].n}</div></div><div style="text-align:right"><div class="lab">Points</div><div class="lcd big">${L.pts}</div></div></div>`;
-  if (nxt >= 0) {
-    const g = GW[nxt], d = days(g.date);
-    b += `<div class="nx"><div class="row"><span class="lab">Next up · Gameweek ${g.gameweek} · ${fd(g.date)}</span><span class="lcd" style="font-size:22px">${d == 0 ? 'TODAY' : d == 1 ? '1 day' : d + ' days'}</span></div>${g.matches.map(m => `<button data-t="${m.home}"><span class="h">${T[m.home].n} ${crest(m.home, 28)}</span><span class="vs">v</span><span class="a">${crest(m.away, 28)} ${T[m.away].n}</span></button>`).join('')}${g.bye ? `<div class="lab">Bye: ${T[g.bye].n}</div>` : ''}</div>`;
+  if (nd) {
+    const ms = up.filter(m => m.d == nd), d = days(nd), gws = [...new Set(ms.map(m => m.gw))], g = GW.find(x => x.gameweek == gws[0]);
+    const full = gws.length == 1 && ms.length == g.matches.length;
+    b += `<div class="nx"><div class="row"><span class="lab">Next up · Gameweek ${gws.join(' & ')} · ${fd(nd)}</span><span class="lcd" style="font-size:22px">${d == 0 ? 'TODAY' : d == 1 ? '1 day' : d + ' days'}</span></div>${ms.map(m => `<button data-t="${m.h}"><span class="h">${T[m.h].n} ${crest(m.h, 28)}</span><span class="vs">v</span><span class="a">${crest(m.a, 28)} ${T[m.a].n}</span></button>`).join('')}${full && g.bye ? `<div class="lab">Bye: ${T[g.bye].n}</div>` : ''}</div>`;
   } else b += `<div class="nx"><div class="lab">Season complete</div></div>`;
   $('board').innerHTML = b;
   renderGws(); renderGw();
@@ -131,12 +132,14 @@ function mrow(m) {
   let x = '';
   if (r && r[2] == 'ff') x = '<div class="note">★ Awarded by forfeit</div>';
   if (!r && past) x = '<div class="note">Played – result to follow</div>';
+  if (m.d != m.gd) x += `<div class="note">${r || past ? 'Played' : 'Rearranged to'} ${fd(m.d, {weekday: 'long', day: 'numeric', month: 'long'})}</div>`;
   if (m.ph) x += `<button class="mph" data-m="${m.k}"><img src="${m.ph}" alt="" loading="lazy"><span>Match photo</span></button>`;
   return `<div class="m${m.ph ? ' has-ph' : ''}"><button class="t h" data-t="${m.h}">${T[m.h].n} ${crest(m.h, 28)}</button>${mid}<button class="t" data-t="${m.a}">${crest(m.a, 28)} ${T[m.a].n}</button>${x}</div>`;
 }
 function renderGw() {
   const g = GW[cur], ms = M.filter(m => m.gw == g.gameweek), n = ms.filter(res).length, d = days(g.date);
-  const tag = n == ms.length ? '<span class="tag ft">Full time</span>' : d < 0 ? '<span class="tag aw">Results to follow</span>' : `<span class="tag">${d == 0 ? 'Today' : 'In ' + d + ' day' + (d == 1 ? '' : 's')}</span>`;
+  const fut = ms.filter(m => !res(m) && days(m.d) >= 0).map(m => days(m.d)).sort((p, q) => p - q);
+  const tag = n == ms.length ? '<span class="tag ft">Full time</span>' : fut.length && n ? `<span class="tag">${n} of ${ms.length} played · next ${fut[0] == 0 ? 'today' : 'in ' + fut[0] + ' day' + (fut[0] == 1 ? '' : 's')}</span>` : d < 0 ? '<span class="tag aw">Results to follow</span>' : `<span class="tag">${d == 0 ? 'Today' : 'In ' + d + ' day' + (d == 1 ? '' : 's')}</span>`;
   $('gw').innerHTML = `<div class="gwh"><h3>Gameweek ${g.gameweek}</h3><span>${fd(g.date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})} ${tag}</span></div>${ms.map(mrow).join('')}${g.bye ? `<div class="bye">${crest(g.bye, 20)} ${T[g.bye].n} have the bye</div>` : ''}${g.note ? `<div class="brk">${esc(g.note)}</div>` : ''}`;
 }
 
