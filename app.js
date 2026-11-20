@@ -35,17 +35,17 @@ if (D.lastUpdated) $('upd').textContent = 'Last updated ' + fd(D.lastUpdated, {w
 // ---------- table ----------
 function table() {
   const S = {};
-  Object.keys(T).forEach(id => S[id] = {id, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, f: []});
+  Object.keys(T).forEach(id => S[id] = {id, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, cs: 0, f: []});
   M.forEach(m => {
     const r = res(m); if (!r) return;
     const [x, y] = r, H = S[m.h], A = S[m.a];
-    H.p++; A.p++; H.gf += x; H.ga += y; A.gf += y; A.ga += x;
+    H.p++; A.p++; H.gf += x; H.ga += y; A.gf += y; A.ga += x; if (!y) H.cs++; if (!x) A.cs++;
     if (x > y) { H.w++; A.l++; H.f.push('W'); A.f.push('L'); }
     else if (x < y) { A.w++; H.l++; A.f.push('W'); H.f.push('L'); }
     else { H.d++; A.d++; H.f.push('D'); A.f.push('D'); }
   });
   const a = Object.values(S);
-  a.forEach(s => { s.gd = s.gf - s.ga; s.pts = s.w * 3 + s.d; });
+  a.forEach(s => { s.gd = s.gf - s.ga; s.pts = s.w * 3 + s.d; s.ppg = s.p ? s.pts / s.p : 0; s.fp = s.f.slice(-5).reduce((t, x) => t + (x == 'W' ? 3 : x == 'D' ? 1 : 0), 0); });
   a.sort((p, q) => q.pts - p.pts || q.gd - p.gd || q.gf - p.gf || T[p.id].n.localeCompare(T[q.id].n));
   a.forEach((s, i) => s.pos = i + 1);
   return a;
@@ -104,11 +104,34 @@ function awards() {
   $('team-awards').innerHTML = teamAward('Firepower', FIRE, 'gf', false, 'goal', 'Most goals scored by a team', 'fp') + teamAward('Brick Wall', WALL, 'ga', true, 'goal', 'Fewest goals conceded by a team', 'bw');
 }
 
+// ---------- table views ----------
+// [key, chip label, lower is better, column it lives in (or extra)]
+const MET = [
+  ['pts', 'Points', false, 'Pts'], ['w', 'Most wins', false, 'W'], ['gf', 'Most goals', false, 'GF'],
+  ['ga', 'Fewest conceded', true, 'GA'], ['gd', 'Goal difference', false, 'GD'], ['ppg', 'Points per game', false, null],
+  ['cs', 'Clean sheets', false, null], ['l', 'Fewest defeats', true, 'L'], ['fp', 'Form (last 5)', false, 'Form']];
+let tm = 'pts';
+function drawTable(st) {
+  const [k, lab, asc, col] = MET.find(x => x[0] == tm);
+  const L = tm == 'pts' ? st : st.slice().sort((p, q) => (asc ? p[k] - q[k] : q[k] - p[k]) || p.pos - q.pos);
+  let r = 0, prev = null; const rk = L.map((s, i) => { if (tm == 'pts') return s.pos; if (s[k] !== prev) { r = i + 1; prev = s[k]; } return r; });
+  const extra = col ? null : (tm == 'ppg' ? 'PPG' : 'CS');
+  const fmt = s => tm == 'ppg' ? s.ppg.toFixed(2) : s[k];
+  const cols = [['P', s => s.p], ['W', s => s.w], ['D', s => s.d], ['L', s => s.l], ['GF', s => s.gf, 'hx'], ['GA', s => s.ga, 'hx'], ['GD', s => sg(s.gd)], ['Pts', s => s.pts, 'pts'], ['Form', s => form(s.f)]];
+  if (extra) cols.splice(0, 0, [extra, fmt, 'pts']);
+  const on = h => h == (col || extra);
+  const cl = c => [on(c[0]) ? 'hl' : (c[2] || '')].filter(Boolean).join(' ');
+  document.querySelector('#tbl thead').innerHTML = `<tr><th>${tm == 'pts' ? 'Pos' : 'Rank'}</th><th>Club</th>${cols.map(c => `<th class="${cl(c)}">${c[0]}</th>`).join('')}</tr>`;
+  document.querySelector('#tbl tbody').innerHTML = L.map((s, i) => `<tr data-t="${s.id}" class="${rk[i] == 1 && (tm != 'pts' || s.pts) ? 'top' : ''}"><td><span class="pos">${rk[i]}</span></td><td class="tm"><button data-t="${s.id}">${crest(s.id, 30)}<span class="full">${T[s.id].n}</span><span class="sh">${T[s.id].s}</span></button></td>${cols.map(c => `<td class="${cl(c)}">${c[1](s)}</td>`).join('')}</tr>`).join('');
+  $('tkey').textContent = tm == 'pts' ? 'League order: points, then goal difference, then goals scored.' : `Ranked by ${lab.toLowerCase()}${extra == 'PPG' ? ' (points ÷ games played)' : extra == 'CS' ? ' (games without conceding)' : tm == 'fp' ? ' (points from the last 5 games)' : ''}. Level teams share a rank and are listed in league order.`;
+  $('tsort').innerHTML = MET.map(x => `<button data-tm="${x[0]}" aria-pressed="${x[0] == tm}">${x[1]}</button>`).join('');
+}
+
 // ---------- home ----------
 function render() {
   const st = table(), played = M.filter(res).length;
   $('tsub').textContent = `${played} of ${M.length} games played. Tap a club for its full record.`;
-  document.querySelector('#tbl tbody').innerHTML = st.map(s => `<tr data-t="${s.id}" class="${s.pos == 1 && s.pts ? 'top' : ''}"><td><span class="pos">${s.pos}</span></td><td class="tm"><button data-t="${s.id}">${crest(s.id, 30)}<span class="full">${T[s.id].n}</span><span class="sh">${T[s.id].s}</span></button></td><td>${s.p}</td><td>${s.w}</td><td>${s.d}</td><td>${s.l}</td><td class="hx">${s.gf}</td><td class="hx">${s.ga}</td><td>${sg(s.gd)}</td><td class="pts">${s.pts}</td><td>${form(s.f)}</td></tr>`).join('');
+  drawTable(st);
   const L = st[0], up = M.filter(m => !res(m) && days(m.d) >= 0), nd = up.length ? up.reduce((x, m) => m.d < x ? m.d : x, up[0].d) : null;
   let b = `<div class="row"><div><div class="lab">Top of the table</div><div class="lcd big">${T[L.id].n}</div></div><div style="text-align:right"><div class="lab">Points</div><div class="lcd big">${L.pts}</div></div></div>`;
   if (nd) {
@@ -200,6 +223,8 @@ document.addEventListener('click', e => {
   if (ps) { psort = +ps.dataset.s; const p = $('panel'), sc = p.scrollTop; club(open); p.scrollTop = sc; return; }
   const al = e.target.closest('[data-all]');
   if (al) { const w = al.closest('.aw'), on = al.textContent.startsWith('Show all'); w.querySelectorAll('li.more').forEach(li => li.hidden = !on); al.textContent = on ? 'Show top 10' : 'Show all ' + w.querySelectorAll('.aw-list li').length; return; }
+  const tb = e.target.closest('[data-tm]');
+  if (tb) { tm = tb.dataset.tm; drawTable(table()); return; }
   const g = e.target.closest('[data-g]');
   if (g) { cur = +g.dataset.g; renderGws(); renderGw(); return; }
   const t = e.target.closest('[data-t]');

@@ -179,3 +179,9 @@ button.sc{border:0;cursor:pointer;box-shadow:0 0 0 2px var(--tl)}
 .aw-all{display:block;margin:0 18px 16px;width:calc(100% - 36px);min-height:44px;border-radius:10px;border:1px solid var(--line);background:#15173a;font-weight:700}
 .aw-all:hover{border-color:var(--tl)}
 .aw-list li[hidden]{display:none}
+.tsort{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;margin-bottom:4px;scrollbar-width:thin}
+.tsort button{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:700;font-size:14px}
+.tsort button[aria-pressed=true]{background:var(--tl);color:#08221f;border-color:var(--tl)}
+#tbl th.hl{color:var(--tl)}#tbl td.hl{color:var(--tl);font-family:"Saira Condensed";font-weight:800;font-size:20px}
+#tbl td.hl .form{outline:2px solid var(--tl);outline-offset:3px;border-radius:999px}
+@media(max-width:600px){#tbl .hx.hl{display:table-cell}}
