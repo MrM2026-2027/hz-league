@@ -21,7 +21,7 @@ const res = m => m.sc ? [m.sc[0], m.sc[1], m.ff ? 'ff' : ''] : null;
 // player row: [name, apps, goals, assists, cleanSheets, goals+assists, team]
 const PLAYERS = {}, ALL = [];
 for (const [t, list] of Object.entries(D.players || {})) {
-  PLAYERS[t] = list.map(p => { const r = [p.name, p.apps || 0, p.goals || 0, p.assists || 0, p.cleanSheets || 0]; r[5] = r[2] + r[3]; r[6] = t; ALL.push(r); return r; });
+  PLAYERS[t] = list.map(p => { const r = [p.name, p.apps ?? null, p.goals || 0, p.assists || 0, p.cleanSheets || 0]; r[5] = r[2] + r[3]; r[6] = t; ALL.push(r); return r; });
 }
 
 const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -61,12 +61,13 @@ function squad(id) {
   const PL = PLAYERS[id]; if (!PL || !PL.length) return '';
   const top = pord(2, PL)[0], ga = pord(5, PL)[0];
   const H = [['Player', 0], ['Apps', 1], ['G', 2], ['A', 3], ['G+A', 5], ['CS', 4]];
-  const tiles = [[top[2], 'Top scorer', top[0]], [ga[5], 'Goal involvements', ga[0]], [sum(PL, 2), 'Goals', PL.filter(p => p[2]).length + ' scorers'], [sum(PL, 3), 'Assists', PL.filter(p => p[3]).length + ' players']];
+  const who = k => { const n = PL.filter(p => p[k] == (k == 2 ? top : ga)[k]); return n.length == 1 ? n[0][0] : n.length <= 3 ? n.map(p => p[0]).join(', ') : n.length + ' players tied'; };
+  const tiles = [[top[2], 'Top scorer', who(2)], [ga[5], 'Goal involvements', who(5)], [sum(PL, 2), 'Goals', PL.filter(p => p[2]).length + ' scorers'], [sum(PL, 3), 'Assists', PL.filter(p => p[3]).length + ' players']];
   return `<div class="blk"><h4>${esc(T[id].n)} squad</h4>
   <div class="pl-top">${tiles.map(([v, l, x]) => `<div><b>${v}</b><span>${l}</span><small>${esc(x)}</small></div>`).join('')}</div>
   <table id="pl"><thead><tr>${H.map(([h, k], i) => i ? `<th><button data-s="${k}" aria-pressed="${k == psort}">${h}</button></th>` : `<th style="text-align:left">${h}</th>`).join('')}</tr></thead>
-  <tbody>${pord(psort, PL).map(p => `<tr class="${p === top && top[2] ? 'gold' : ''}"><td class="n">${esc(p[0])}</td><td>${p[1]}</td><td>${p[2] || '–'}</td><td>${p[3] || '–'}</td><td>${p[5] || '–'}</td><td>${p[4] || '–'}</td></tr>`).join('')}</tbody></table>
-  <div class="key">${PL.length} players used. Tap a heading to sort. G goals, A assists, CS clean sheets.</div></div>`;
+  <tbody>${pord(psort, PL).map(p => `<tr class="${p === top && top[2] && PL.filter(q => q[2] == top[2]).length == 1 ? 'gold' : ''}"><td class="n">${esc(p[0])}</td><td>${p[1] ?? '–'}</td><td>${p[2] || '–'}</td><td>${p[3] || '–'}</td><td>${p[5] || '–'}</td><td>${p[4] || '–'}</td></tr>`).join('')}</tbody></table>
+  <div class="key">${D.playerNotes && D.playerNotes[id] ? esc(D.playerNotes[id]) : PL.length + ' players used.'} Tap a heading to sort. G goals, A assists, CS clean sheets.</div></div>`;
 }
 function rank(L, k) { let r = 0, prev = null; return L.map((p, i) => { if (p[k] !== prev) { r = i + 1; prev = p[k]; } return [r, p]; }); }
 const BOOT = '<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><path d="M14 6h18v26l18 8c6 3 8 7 8 12v4H8V44c0-4 2-6 6-8z" fill="#f5c518" stroke="#7a5b00" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 52h50v4H8z" fill="#7a5b00"/><path d="M14 18h18M14 26h18" stroke="#7a5b00" stroke-width="2.5"/><circle cx="18" cy="60" r="2.5" fill="#7a5b00"/><circle cx="30" cy="60" r="2.5" fill="#7a5b00"/><circle cx="44" cy="60" r="2.5" fill="#7a5b00"/></svg>';
@@ -78,7 +79,7 @@ function award(title, icon, k, unit, cls) {
        <div class="aw-num"><b>${lead[0][k]}</b><span>${unit}${lead[0][k] == 1 ? '' : 's'}</span><em>${lead.length > 1 ? 'Joint leaders' : 'Leader'}</em></div>`
     : '<p class="sub">No entries yet.</p>';
   return `<article class="aw ${cls}"><header>${icon}<div><h3>${title}</h3><small>Most ${unit}s across the league</small></div></header><div class="aw-top">${top}</div>
-  <ol class="aw-list">${R.slice(0, 10).map(([r, p]) => `<li><span class="rk">${r}</span><button class="aw-row" data-t="${p[6]}">${crest(p[6], 26)}<span><b>${esc(p[0])}</b><small>${T[p[6]].n} · ${p[1]} app${p[1] == 1 ? '' : 's'}</small></span></button><span class="v">${p[k]}</span></li>`).join('')}</ol></article>`;
+  <ol class="aw-list">${R.slice(0, 10).map(([r, p]) => `<li><span class="rk">${r}</span><button class="aw-row" data-t="${p[6]}">${crest(p[6], 26)}<span><b>${esc(p[0])}</b><small>${T[p[6]].n}${p[1] == null ? '' : ` · ${p[1]} app${p[1] == 1 ? '' : 's'}`}</small></span></button><span class="v">${p[k]}</span></li>`).join('')}</ol></article>`;
 }
 const WALL = '<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><g fill="#c4553d" stroke="#5b2016" stroke-width="2"><rect x="4" y="10" width="26" height="12" rx="1.5"/><rect x="34" y="10" width="26" height="12" rx="1.5"/><rect x="4" y="26" width="12" height="12" rx="1.5"/><rect x="20" y="26" width="26" height="12" rx="1.5"/><rect x="50" y="26" width="10" height="12" rx="1.5"/><rect x="4" y="42" width="26" height="12" rx="1.5"/><rect x="34" y="42" width="26" height="12" rx="1.5"/></g></svg>';
 const FIRE = '<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><path d="M32 4c4 10 16 16 16 32a16 16 0 0 1-32 0c0-8 4-12 7-16 0 6 3 9 6 10-2-10 1-18 3-26z" fill="#ff7a1a" stroke="#7a2a00" stroke-width="2.5" stroke-linejoin="round"/><path d="M32 30c3 5 8 8 8 15a8 8 0 0 1-16 0c0-5 3-7 5-10 0 3 2 5 3 5z" fill="#f5c518"/></svg>';

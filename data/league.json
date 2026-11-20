@@ -1,6 +1,6 @@
 {
   "season": "2026–27",
-  "lastUpdated": "2026-11-19",
+  "lastUpdated": "2026-11-20",
   "teams": {
     "WYC": {
       "name": "Wycombe Abbey",
@@ -203,6 +203,15 @@
       { "name": "Meng", "apps": 2, "goals": 0, "assists": 0, "cleanSheets": 1 },
       { "name": "Simon", "apps": 1, "goals": 0, "assists": 0, "cleanSheets": 1 },
       { "name": "Jacky", "apps": 1, "goals": 1, "assists": 0, "cleanSheets": 0 }
+    ],
+    "BAS": [
+      { "name": "Ed", "goals": 1 },
+      { "name": "Henry", "goals": 1 },
+      { "name": "Jack", "goals": 1 },
+      { "name": "Dan", "goals": 1 }
     ]
+  },
+  "playerNotes": {
+    "BAS": "Goalscorers only so far. Full squad, appearances and assists to come."
   }
 }
