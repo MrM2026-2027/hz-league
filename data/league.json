@@ -74,7 +74,7 @@
       "matches": [
         { "home": "WLI", "away": "HIS", "score": [1, 0], "forfeit": true },
         { "home": "DIN", "away": "WBO", "score": [0, 1], "forfeit": true },
-        { "home": "WYC", "away": "WAH", "score": null, "date": "2026-11-20" }
+        { "home": "WYC", "away": "WAH", "score": [1, 0], "date": "2026-11-20", "photo": "img/matches/2026-11-20-wyc-wah.jpg", "caption": "Wycombe Abbey and WAHAHA after the final whistle" }
       ],
       "bye": "BAS"
     },
@@ -167,7 +167,7 @@
   ],
   "players": {
     "WYC": [
-      { "name": "Paul", "apps": 2, "goals": 4, "assists": 1, "cleanSheets": 0 },
+      { "name": "Paul", "apps": 3, "goals": 5, "assists": 1, "cleanSheets": 0 },
       { "name": "Connaire", "apps": 2, "goals": 1, "assists": 0, "cleanSheets": 0 },
       { "name": "Andrew", "apps": 2, "goals": 1, "assists": 1, "cleanSheets": 1 },
       { "name": "Goran", "apps": 2, "goals": 1, "assists": 0, "cleanSheets": 1 },
