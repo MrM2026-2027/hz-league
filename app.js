@@ -79,7 +79,7 @@ function award(title, icon, k, unit, cls) {
        <div class="aw-num"><b>${lead[0][k]}</b><span>${unit}${lead[0][k] == 1 ? '' : 's'}</span><em>${lead.length > 1 ? 'Joint leaders' : 'Leader'}</em></div>`
     : '<p class="sub">No entries yet.</p>';
   return `<article class="aw ${cls}"><header>${icon}<div><h3>${title}</h3><small>Most ${unit}s across the league</small></div></header><div class="aw-top">${top}</div>
-  <ol class="aw-list">${R.slice(0, 10).map(([r, p]) => `<li><span class="rk">${r}</span><button class="aw-row" data-t="${p[6]}">${crest(p[6], 26)}<span><b>${esc(p[0])}</b><small>${T[p[6]].n}${p[1] == null ? '' : ` · ${p[1]} app${p[1] == 1 ? '' : 's'}`}</small></span></button><span class="v">${p[k]}</span></li>`).join('')}</ol></article>`;
+  <ol class="aw-list">${R.map(([r, p], i) => `<li${i >= 10 ? ' class="more" hidden' : ''}><span class="rk">${r}</span><button class="aw-row" data-t="${p[6]}">${crest(p[6], 26)}<span><b>${esc(p[0])}</b><small>${T[p[6]].n}${p[1] == null ? '' : ` · ${p[1]} app${p[1] == 1 ? '' : 's'}`}</small></span></button><span class="v">${p[k]}</span></li>`).join('')}</ol>${R.length > 10 ? `<button class="aw-all" data-all>Show all ${R.length}</button>` : ''}</article>`;
 }
 const WALL = '<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><g fill="#c4553d" stroke="#5b2016" stroke-width="2"><rect x="4" y="10" width="26" height="12" rx="1.5"/><rect x="34" y="10" width="26" height="12" rx="1.5"/><rect x="4" y="26" width="12" height="12" rx="1.5"/><rect x="20" y="26" width="26" height="12" rx="1.5"/><rect x="50" y="26" width="10" height="12" rx="1.5"/><rect x="4" y="42" width="26" height="12" rx="1.5"/><rect x="34" y="42" width="26" height="12" rx="1.5"/></g></svg>';
 const FIRE = '<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true"><path d="M32 4c4 10 16 16 16 32a16 16 0 0 1-32 0c0-8 4-12 7-16 0 6 3 9 6 10-2-10 1-18 3-26z" fill="#ff7a1a" stroke="#7a2a00" stroke-width="2.5" stroke-linejoin="round"/><path d="M32 30c3 5 8 8 8 15a8 8 0 0 1-16 0c0-5 3-7 5-10 0 3 2 5 3 5z" fill="#f5c518"/></svg>';
@@ -195,6 +195,8 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-close]')) { close(); return; }
   const ps = e.target.closest('[data-s]');
   if (ps) { psort = +ps.dataset.s; const p = $('panel'), sc = p.scrollTop; club(open); p.scrollTop = sc; return; }
+  const al = e.target.closest('[data-all]');
+  if (al) { const w = al.closest('.aw'), on = al.textContent.startsWith('Show all'); w.querySelectorAll('li.more').forEach(li => li.hidden = !on); al.textContent = on ? 'Show top 10' : 'Show all ' + w.querySelectorAll('.aw-list li').length; return; }
   const g = e.target.closest('[data-g]');
   if (g) { cur = +g.dataset.g; renderGws(); renderGw(); return; }
   const t = e.target.closest('[data-t]');

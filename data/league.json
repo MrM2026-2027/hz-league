@@ -209,9 +209,18 @@
       { "name": "Henry", "goals": 1 },
       { "name": "Jack", "goals": 1 },
       { "name": "Dan", "goals": 1 }
+    ],
+    "WLI": [
+      { "name": "Adam", "goals": 2 },
+      { "name": "Harvey", "goals": 1 }
+    ],
+    "WBO": [
+      { "name": "Andrew", "goals": 1 }
     ]
   },
   "playerNotes": {
-    "BAS": "Goalscorers only so far. Full squad, appearances and assists to come."
+    "BAS": "Goalscorers only so far. Full squad, appearances and assists to come.",
+    "WLI": "Goalscorers only so far. Full squad, appearances and assists to come.",
+    "WBO": "Goalscorers only so far. Full squad, appearances and assists to come."
   }
 }
