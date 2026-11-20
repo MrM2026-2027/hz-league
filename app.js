@@ -35,13 +35,13 @@ if (D.lastUpdated) $('upd').textContent = 'Last updated ' + fd(D.lastUpdated, {w
 // ---------- table ----------
 function table() {
   const S = {};
-  Object.keys(T).forEach(id => S[id] = {id, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, cs: 0, f: []});
+  Object.keys(T).forEach(id => S[id] = {id, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, cs: 0, hw: 0, aw: 0, f: []});
   M.forEach(m => {
     const r = res(m); if (!r) return;
     const [x, y] = r, H = S[m.h], A = S[m.a];
     H.p++; A.p++; H.gf += x; H.ga += y; A.gf += y; A.ga += x; if (!y) H.cs++; if (!x) A.cs++;
-    if (x > y) { H.w++; A.l++; H.f.push('W'); A.f.push('L'); }
-    else if (x < y) { A.w++; H.l++; A.f.push('W'); H.f.push('L'); }
+    if (x > y) { H.w++; H.hw++; A.l++; H.f.push('W'); A.f.push('L'); }
+    else if (x < y) { A.w++; A.aw++; H.l++; A.f.push('W'); H.f.push('L'); }
     else { H.d++; A.d++; H.f.push('D'); A.f.push('D'); }
   });
   const a = Object.values(S);
@@ -109,13 +109,14 @@ function awards() {
 const MET = [
   ['pts', 'Points', false, 'Pts'], ['w', 'Most wins', false, 'W'], ['gf', 'Most goals', false, 'GF'],
   ['ga', 'Fewest conceded', true, 'GA'], ['gd', 'Goal difference', false, 'GD'], ['ppg', 'Points per game', false, null],
+  ['hw', 'Home wins', false, null], ['aw', 'Away wins', false, null],
   ['cs', 'Clean sheets', false, null], ['l', 'Fewest defeats', true, 'L'], ['fp', 'Form (last 5)', false, 'Form']];
 let tm = 'pts';
 function drawTable(st) {
   const [k, lab, asc, col] = MET.find(x => x[0] == tm);
   const L = tm == 'pts' ? st : st.slice().sort((p, q) => (asc ? p[k] - q[k] : q[k] - p[k]) || p.pos - q.pos);
   let r = 0, prev = null; const rk = L.map((s, i) => { if (tm == 'pts') return s.pos; if (s[k] !== prev) { r = i + 1; prev = s[k]; } return r; });
-  const extra = col ? null : (tm == 'ppg' ? 'PPG' : 'CS');
+  const extra = col ? null : {ppg: 'PPG', cs: 'CS', hw: 'Home W', aw: 'Away W'}[tm];
   const fmt = s => tm == 'ppg' ? s.ppg.toFixed(2) : s[k];
   const cols = [['P', s => s.p], ['W', s => s.w], ['D', s => s.d], ['L', s => s.l], ['GF', s => s.gf, 'hx'], ['GA', s => s.ga, 'hx'], ['GD', s => sg(s.gd)], ['Pts', s => s.pts, 'pts'], ['Form', s => form(s.f)]];
   if (extra) cols.splice(0, 0, [extra, fmt, 'pts']);
@@ -123,7 +124,7 @@ function drawTable(st) {
   const cl = c => [on(c[0]) ? 'hl' : (c[2] || '')].filter(Boolean).join(' ');
   document.querySelector('#tbl thead').innerHTML = `<tr><th>${tm == 'pts' ? 'Pos' : 'Rank'}</th><th>Club</th>${cols.map(c => `<th class="${cl(c)}">${c[0]}</th>`).join('')}</tr>`;
   document.querySelector('#tbl tbody').innerHTML = L.map((s, i) => `<tr data-t="${s.id}" class="${rk[i] == 1 && (tm != 'pts' || s.pts) ? 'top' : ''}"><td><span class="pos">${rk[i]}</span></td><td class="tm"><button data-t="${s.id}">${crest(s.id, 30)}<span class="full">${T[s.id].n}</span><span class="sh">${T[s.id].s}</span></button></td>${cols.map(c => `<td class="${cl(c)}">${c[1](s)}</td>`).join('')}</tr>`).join('');
-  $('tkey').textContent = tm == 'pts' ? 'League order: points, then goal difference, then goals scored.' : `Ranked by ${lab.toLowerCase()}${extra == 'PPG' ? ' (points ÷ games played)' : extra == 'CS' ? ' (games without conceding)' : tm == 'fp' ? ' (points from the last 5 games)' : ''}. Level teams share a rank and are listed in league order.`;
+  $('tkey').textContent = tm == 'pts' ? 'League order: points, then goal difference, then goals scored.' : `Ranked by ${lab.toLowerCase()}${extra == 'PPG' ? ' (points ÷ games played)' : extra == 'CS' ? ' (games without conceding)' : tm == 'hw' ? ' (wins as the home team)' : tm == 'aw' ? ' (wins as the away team)' : tm == 'fp' ? ' (points from the last 5 games)' : ''}. Level teams share a rank and are listed in league order.`;
   $('tsort').innerHTML = MET.map(x => `<button data-tm="${x[0]}" aria-pressed="${x[0] == tm}">${x[1]}</button>`).join('');
 }
 
